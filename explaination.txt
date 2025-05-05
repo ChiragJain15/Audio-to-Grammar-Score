@@ -1,0 +1,76 @@
+# Explanation of grammar_scoring_starter.py
+
+This script is designed to build a machine learning pipeline for scoring grammar in audio files using a pretrained Wav2Vec2 model and a Ridge regression model. Below is a section-by-section explanation:
+
+---
+
+## 1. Imports and Setup
+- **Imports**: Loads essential libraries for data handling (numpy, pandas), audio processing (torchaudio), machine learning (scikit-learn, transformers), and visualization (matplotlib).
+- **Device Setup**: Checks if a GPU is available and sets the computation device accordingly.
+
+---
+
+## 2. Load Data
+- **train_df**: Loads the training data CSV, which contains filenames and grammar scores (labels).
+- **test_df**: Loads the test data CSV, which contains filenames for which predictions are needed.
+
+---
+
+## 3. Load Pretrained Wav2Vec2
+- **Wav2Vec2Processor & Wav2Vec2Model**: Loads the processor and model from HuggingFace's transformers library. These are used to extract meaningful features from raw audio.
+- **Model to Device**: Moves the model to the selected device (CPU or GPU) and sets it to evaluation mode.
+
+---
+
+## 4. Feature Extraction
+- **extract_features(file_path)**: 
+    - Loads an audio file and resamples it to 16kHz.
+    - Processes the waveform using the Wav2Vec2 processor.
+    - Passes the processed audio through the Wav2Vec2 model to get embeddings.
+    - Returns the mean of the last hidden state as a feature vector.
+
+---
+
+## 5. Extract Features for Train
+- **X, y**: Lists to store features and labels.
+- **Feature Dimension Check**: Extracts features from the first file to determine the expected feature vector size.
+- **Loop Over Training Data**: For each training audio file:
+    - Extracts features.
+    - Checks if the feature vector has the correct dimension.
+    - Appends the feature and label to X and y, respectively.
+    - Handles errors and skips files with incorrect dimensions.
+- **Convert to Numpy Arrays**: Converts X and y to numpy arrays for use in scikit-learn.
+
+---
+
+## 6. Train-Validation Split
+- **Splitting**: Splits the data into training and validation sets (80/20 split).
+- **Model Training**: Trains a Ridge regression model on the training set.
+- **Validation**: Predicts on the validation set and computes the RMSE (Root Mean Squared Error) to evaluate performance.
+
+---
+
+## 7. Retrain on Full Data
+- **Retraining**: Fits the Ridge regression model on the entire training dataset (X, y) for final predictions.
+
+---
+
+## 8. Predict on Test Data
+- **Feature Extraction for Test**: Extracts features from each test audio file, ensuring correct feature dimensions.
+- **Prediction**: Uses the trained model to predict grammar scores for the test set.
+- **Submission File**: Saves the predictions in a CSV file (submission.csv) with filenames and predicted labels.
+
+---
+
+## 9. Final Notes
+- **Prints Final RMSE**: Outputs the validation RMSE for reference.
+
+---
+
+## 10. Optional Visualization
+- **Scatter Plot**: Plots true vs. predicted grammar scores for the validation set to visually assess model performance.
+
+---
+
+## Summary
+This script provides a full pipeline for extracting features from audio using a pretrained deep learning model, training a regression model, evaluating it, and generating predictions for a test set. It is modular and can be extended or improved for better performance or additional features. 
